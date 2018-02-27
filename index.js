@@ -1,5 +1,5 @@
 const server = require("http").Server();
-const port = 4007;
+const port = process.env.PORT || 4007;
 var io = require("socket.io")(server);
 
 var allusers ={};
