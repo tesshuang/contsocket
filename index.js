@@ -27,7 +27,7 @@ io.on("connection", function(socket){
         }else if(allusers[data].length === 2){
              io.to(data).emit("startgame");
         }else if(allusers[data].length > 2){
-          socket.to(socket.id).emit("toomany");
+          io.to(socket.id).emit("toomany");
         }
         
         io.to(data).emit("userjoined", allusers[data]);
