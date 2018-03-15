@@ -43,8 +43,9 @@ io.on("connection", function(socket){
         
         /*io.to(data.roomstr).emit("userjoined", allusers[data.roomstr]);*/
     });
-   
+    
     socket.on("getquiz", function(data){
+        
         request(
         {
             method:"GET",
@@ -52,7 +53,7 @@ io.on("connection", function(socket){
         },
             function(err, resp, body){
                 if(resp.statusCode === 200){
-                    console.log("body" );
+                    console.log("body"+socket.myRoom);
                 }else{
                     console.log("error");
                 }
@@ -60,12 +61,12 @@ io.on("connection", function(socket){
         )
         .on('data', function(data) {
             // decompressed data as it is received
-            console.log('decoded chunk: ' + data);
+            console.log('decoded chunk: '+data);
             if(data.length !== 0){
-                console.log("hihi"+ socket.myRoom);
-                /*
-                allusers[socket.myRoom].qobj.push(data);
-                socket.to(socket.myRoom).emit("sendquiz", data);*/
+                var ndata = JSON.parse(data)
+                allusers[socket.myRoom].qobj = ndata;
+                socket.emit("sendquiz", ndata);
+                /*console.log("sendobj"+allusers[socket.myRoom].qobj);*/
             }
             
             
@@ -74,16 +75,34 @@ io.on("connection", function(socket){
             // unmodified http.IncomingMessage object
             response.on('data', function(data) {
               // compressed data as it is received
-              console.log('received ' + data.length + ' bytes of compressed data')
+              console.log('received ' + data.length);
+                console.log("what is room"+socket.myRoom);
             })
           })
     });
     
+    socket.on("answer", function(data){
+        console.log(data, allusers[socket.myRoom].qobj[data.index].keyans);
+        var point = 0;
+        if(data.key === allusers[socket.myRoom].qobj[data.index].keyans){
+            point = 1
+        }else{
+            point = -1
+        }
+        var pointobj = {
+            usrpoint:point,
+            id:socket.id
+        }
+        console.log(socket.id);
+        socket.emit("points", pointobj);
+    })
+    
+    
     socket.on("disconnect", function(data){
-        console.log(socket.myRoom);
-       if(this.myRoom){
-            var index = allusers[this.myRoom].indexOf(socket.id);
-            allusers[this.myRoom].splice(index,1);
+       
+       if(socket.myRoom){
+            var index = allusers[socket.myRoom].usrinfo.indexOf(socket.id);
+            allusers[socket.myRoom].usrinfo.splice(index,1);
             /*io.to(this.myRoom).emit("userjoined", allusers[this.myRoom]);*/
         }
     });
