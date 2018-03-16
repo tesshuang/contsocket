@@ -30,6 +30,8 @@ io.on("connection", function(socket){
             conava:data.usrinfo.conava
         }
         
+        io.to(data.roomstr).emit("userjoined", socket.id);
+        
         allusers[data.roomstr].usrinfo.push(conusrinfo);
         console.log(allusers);
         
@@ -81,22 +83,55 @@ io.on("connection", function(socket){
           })
     });
     
+    var player1 = 0,
+        player2 = 0,
+        scorebank1 =[],
+        scorebank2 =[];
+    
     socket.on("answer", function(data){
         console.log(data, allusers[socket.myRoom].qobj[data.index].keyans);
         var point = 0;
+
         if(data.key === allusers[socket.myRoom].qobj[data.index].keyans){
-            point = 1
+            /*point = 1;*/
+            if(socket.id === data.id){
+                player1++;
+                scorebank1.push(player1);
+            }else{
+                player2 ++;
+                scorebank2.push(player2);
+            }
+            console.log("P1"+player1, " P2"+player2);
         }else{
-            point = -1
+            /*point = -1*/
+            if(socket.id === data.id){
+                player1--;
+                scorebank1.push(player1);
+            }else{
+                player2--;
+                scorebank2.push(player2);
+            }
         }
-        var pointobj = {
+        
+        console.log("P1total"+scorebank1, " P2total"+scorebank2);
+        
+        return player1, player2;
+        /*var pointobj = {
             usrpoint:point,
             id:socket.id
         }
         console.log(socket.id);
-        socket.emit("points", pointobj);
+        io.to(this.myRoom).emit("points", pointobj);*/
     })
     
+    
+    socket.on("total1", function(data){
+       console.log(data); 
+    });
+    
+    socket.on("total2", function(data){
+       console.log(data); 
+    });
     
     socket.on("disconnect", function(data){
        
