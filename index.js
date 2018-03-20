@@ -4,7 +4,9 @@ var io = require("socket.io")(server);
 var request = require("request");
 
 var allusers ={};
-
+var player1 = 0,
+    player2 = 0,
+    scorebank = {};
 
 io.on("connection", function(socket){
         console.log("connected");
@@ -34,6 +36,8 @@ io.on("connection", function(socket){
         
         allusers[data.roomstr].usrinfo.push(conusrinfo);
         console.log(allusers);
+        
+        scorebank[socket.id]=0;
         
         if(allusers[data.roomstr].usrinfo.length === 1){
             io.to(data.roomstr).emit("waiting", allusers[data.roomstr].usrinfo);
@@ -83,17 +87,18 @@ io.on("connection", function(socket){
           })
     });
     
-    var player1 = 0,
-        player2 = 0,
-        scorebank1 =[],
-        scorebank2 =[];
+    
     
     socket.on("answer", function(data){
         console.log(data, allusers[socket.myRoom].qobj[data.index].keyans);
         var point = 0;
 
         if(data.key === allusers[socket.myRoom].qobj[data.index].keyans){
-            /*point = 1;*/
+            scorebank[socket.id]++;
+        } else {
+            scorebank[socket.id]--;
+        }
+        /*point = 1;
             if(socket.id === data.id){
                 player1++;
                 scorebank1.push(player1);
@@ -101,9 +106,8 @@ io.on("connection", function(socket){
                 player2 ++;
                 scorebank2.push(player2);
             }
-            console.log("P1"+player1, " P2"+player2);
+            
         }else{
-            /*point = -1*/
             if(socket.id === data.id){
                 player1--;
                 scorebank1.push(player1);
@@ -112,10 +116,12 @@ io.on("connection", function(socket){
                 scorebank2.push(player2);
             }
         }
+        console.log("P1"+player1, " P2"+player2);
+        console.log("P1total"+scorebank1, " P2total"+scorebank2);*/
         
-        console.log("P1total"+scorebank1, " P2total"+scorebank2);
+        console.log(scorebank)
+        io.to(this.myRoom).emit("points", scorebank);
         
-        return player1, player2;
         /*var pointobj = {
             usrpoint:point,
             id:socket.id
