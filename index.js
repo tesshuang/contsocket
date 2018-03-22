@@ -131,12 +131,9 @@ io.on("connection", function(socket){
     })
     
     
-    socket.on("total1", function(data){
-       console.log(data); 
-    });
-    
-    socket.on("total2", function(data){
-       console.log(data); 
+    socket.on("gameend", function(data){
+        var score1 = scorebank[data];
+        console.log("score1 "+score1);
     });
     
     socket.on("disconnect", function(data){
