@@ -132,8 +132,9 @@ io.on("connection", function(socket){
     
     
     socket.on("gameend", function(data){
-        var score1 = scorebank[data];
-        console.log("score1 "+score1);
+        var score1 = scorebank[socket.id];
+        console.log("userid: "+data+" score1: "+score1);
+        
     });
     
     socket.on("disconnect", function(data){
@@ -141,7 +142,7 @@ io.on("connection", function(socket){
        if(socket.myRoom){
             var index = allusers[socket.myRoom].usrinfo.indexOf(socket.id);
             allusers[socket.myRoom].usrinfo.splice(index,1);
-            /*io.to(this.myRoom).emit("userjoined", allusers[this.myRoom]);*/
+            io.to(this.myRoom).emit("userleft", allusers[this.myRoom]);
         }
     });
 });
